@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+    app:
+        image: php:8.2-apache
+        container_name: laravel_app
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - "8000:80"
+        depends_on:
+            - mysql
+        environment:
+            - APACHE_DOCUMENT_ROOT=/var/www/html/public
+        command: >
+            bash -c "apt-get update &&
+                     apt-get install -y unzip git zip libzip-dev libpng-dev libonig-dev libxml2-dev curl &&
+                     docker-php-ext-install pdo_mysql mbstring zip exif pcntl &&
+                     apache2-foreground"
+
+    mysql:
+        image: mysql:8
+        container_name: mysql_user_auth
+        ports:
+            - "3308:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: "cCvD3E#6$&16"
+            MYSQL_DATABASE: user_auth
+        restart: unless-stopped
+
+    composer:
+        image: composer:2
+        container_name: composer
+        volumes:
+            - ./:/app
+        working_dir: /app
+        command: install
+
+volumes:
+    mysql_data:
