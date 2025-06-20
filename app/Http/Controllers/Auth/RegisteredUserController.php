@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 use App\Http\Requests\RegisterUserRequest;
 
+
 class RegisteredUserController extends Controller
 {
     /**
