@@ -7,6 +7,7 @@ services:
         working_dir: /var/www/html
         volumes:
             - ./:/var/www/html
+            - ./docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf
         ports:
             - "8000:80"
         depends_on:
@@ -17,7 +18,11 @@ services:
             bash -c "apt-get update &&
                      apt-get install -y unzip git zip libzip-dev libpng-dev libonig-dev libxml2-dev curl &&
                      docker-php-ext-install pdo_mysql mbstring zip exif pcntl &&
+                     a2enmod rewrite &&
                      apache2-foreground"
+        networks:
+            laravel_net:
+                ipv4_address: 172.28.0.2
 
     mysql:
         image: mysql:8
@@ -30,6 +35,9 @@ services:
             MYSQL_ROOT_PASSWORD: "cCvD3E#6$&16"
             MYSQL_DATABASE: user_auth
         restart: unless-stopped
+        networks:
+            laravel_net:
+                ipv4_address: 172.28.0.3
 
     composer:
         image: composer:2
@@ -37,7 +45,32 @@ services:
         volumes:
             - ./:/app
         working_dir: /app
-        command: install
+        tty: true
+        stdin_open: true
+        entrypoint: ["sh"]
+        networks:
+            laravel_net:
+                ipv4_address: 172.28.0.4
+
+    vite:
+        image: node:18
+        container_name: vite
+        working_dir: /app
+        volumes:
+            - ./:/app
+        command: sh -c "npm install && npm run dev"
+        ports:
+            - "5173:5173"
+        networks:
+            laravel_net:
+                ipv4_address: 172.28.0.5
 
 volumes:
     mysql_data:
+
+networks:
+    laravel_net:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.28.0.0/16

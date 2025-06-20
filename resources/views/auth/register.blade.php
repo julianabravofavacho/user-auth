@@ -1,52 +1,136 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+        <div class="col-md-6 col-lg-5">
+            <h2 class="mb-4 text-center">Cadastro</h2>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}" id="registerForm">
+                @csrf
+
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome</label>
+                    <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
+                    @error('name')
+                    <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                    @error('email')
+                    <div class="text-danger small">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Senha</label>
+                    <input id="password" type="password" class="form-control" name="password" required>
+                    <div class="invalid-feedback"></div>
+
+                    <ul id="password-rules" class="list-unstyled small mt-2 mb-4">
+                        <li id="rule-length" class="text-danger">✗ Mínimo 8 caracteres</li>
+                        <li id="rule-upper" class="text-danger">✗ Pelo menos 1 letra maiúscula</li>
+                        <li id="rule-lower" class="text-danger">✗ Pelo menos 1 letra minúscula</li>
+                        <li id="rule-number" class="text-danger">✗ Pelo menos 1 número</li>
+                        <li id="rule-symbol" class="text-danger">✗ Pelo menos 1 símbolo (!, @, #, etc.)</li>
+                    </ul>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirmar Senha</label>
+                    <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required>
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Cadastrar</button>
+                </div>
+
+                <div class="mt-3 text-center">
+                    <a href="{{ route('login') }}">Já tem conta? Faça login</a>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('password_confirmation');
+        const form = document.getElementById('registerForm');
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        const rules = {
+            length: pwd => pwd.length >= 8,
+            upper: pwd => /[A-Z]/.test(pwd),
+            lower: pwd => /[a-z]/.test(pwd),
+            number: pwd => /[0-9]/.test(pwd),
+            symbol: pwd => /[^a-zA-Z0-9]/.test(pwd),
+        };
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+        const feedbackList = {
+            length: document.getElementById('rule-length'),
+            upper: document.getElementById('rule-upper'),
+            lower: document.getElementById('rule-lower'),
+            number: document.getElementById('rule-number'),
+            symbol: document.getElementById('rule-symbol'),
+        };
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+        function updatePasswordRules(pwd) {
+            for (const key in rules) {
+                const passed = rules[key](pwd);
+                feedbackList[key].textContent = (passed ? '✓' : '✗') + ' ' + feedbackList[key].textContent.slice(2);
+                feedbackList[key].classList.toggle('text-success', passed);
+                feedbackList[key].classList.toggle('text-danger', !passed);
+            }
+        }
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+        function markInvalid(input, message) {
+            input.classList.add('is-invalid');
+            input.nextElementSibling.textContent = message;
+        }
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+        function clearInvalid(input) {
+            input.classList.remove('is-invalid');
+            input.nextElementSibling.textContent = '';
+        }
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+        passwordInput.addEventListener('input', function() {
+            updatePasswordRules(passwordInput.value);
+            clearInvalid(passwordInput);
+        });
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
+        confirmInput.addEventListener('input', function() {
+            clearInvalid(confirmInput);
+        });
 
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+            const pwd = passwordInput.value;
+            const confirm = confirmInput.value;
+
+            const strong = Object.values(rules).every(rule => rule(pwd));
+            if (!strong) {
+                markInvalid(passwordInput, 'A senha não atende aos critérios de segurança.');
+                valid = false;
+            }
+
+            if (pwd !== confirm) {
+                markInvalid(confirmInput, 'As senhas não coincidem.');
+                valid = false;
+            }
+
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    </script>
 </x-guest-layout>
