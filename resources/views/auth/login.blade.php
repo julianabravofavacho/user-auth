@@ -8,6 +8,13 @@
                     </div>
 
                     <div class="card-body">
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            @foreach ($errors->all() as $error)
+                            <div>{{ $error }}</div>
+                            @endforeach
+                        </div>
+                        @endif
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
 
@@ -34,6 +41,9 @@
 
                             <div class="mt-3 text-center">
                                 <a href="{{ route('password.request') }}">Esqueceu sua senha?</a>
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a href="{{ route('register') }}">Não tem um registro? Cadastre-se</a>
                             </div>
                         </form>
                     </div>

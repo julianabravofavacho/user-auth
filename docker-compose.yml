@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
     app:
-        image: php:8.2-apache
+        build:
+            context: .
+            dockerfile: Dockerfile
         container_name: laravel_app
         working_dir: /var/www/html
         volumes:
@@ -14,12 +16,7 @@ services:
             - mysql
         environment:
             - APACHE_DOCUMENT_ROOT=/var/www/html/public
-        command: >
-            bash -c "apt-get update &&
-                     apt-get install -y unzip git zip libzip-dev libpng-dev libonig-dev libxml2-dev curl &&
-                     docker-php-ext-install pdo_mysql mbstring zip exif pcntl &&
-                     a2enmod rewrite &&
-                     apache2-foreground"
+        command: apache2-foreground
         networks:
             laravel_net:
                 ipv4_address: 172.28.0.2
