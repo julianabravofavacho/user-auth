@@ -39,18 +39,4 @@ class ProfileController extends Controller
 
         return redirect()->route('profile.edit')->with('success', 'Perfil atualizado com sucesso!');
     }
-
-    public function destroy()
-    {
-        $user = Auth::user();
-
-        // Opcional: remove imagem de perfil do storage
-        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
-            Storage::disk('public')->delete($user->profile_image);
-        }
-
-        $user->delete();
-
-        return redirect('/')->with('success', 'Conta excluída com sucesso.');
-    }
 }
