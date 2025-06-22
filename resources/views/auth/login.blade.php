@@ -68,21 +68,42 @@
         loginForm.addEventListener('submit', (e) => {
             let valid = true;
 
-            if (!emailInput.value.trim()) {
-                markInvalid(emailInput, 'O e-mail é obrigatório.');
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!email || !emailRegex.test(email)) {
+                markInvalid(emailInput, 'Informe um e-mail válido.');
                 valid = false;
-            } else {
-                clearInvalid(emailInput);
             }
 
-            if (!passwordInput.value.trim()) {
-                markInvalid(passwordInput, 'A senha é obrigatória.');
+            if (!password || password.length < 8) {
+                markInvalid(passwordInput, 'A senha deve ter pelo menos 8 caracteres.');
                 valid = false;
-            } else {
-                clearInvalid(passwordInput);
             }
 
             if (!valid) e.preventDefault();
+        });
+
+        emailInput.addEventListener('input', () => {
+            const value = emailInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (value && emailRegex.test(value)) {
+                clearInvalid(emailInput);
+            } else {
+                markInvalid(emailInput, 'Informe um e-mail válido.');
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            const value = passwordInput.value.trim();
+
+            if (value.length >= 8) {
+                clearInvalid(passwordInput);
+            } else {
+                markInvalid(passwordInput, 'A senha deve ter pelo menos 8 caracteres.');
+            }
         });
     </script>
 </x-guest-layout>

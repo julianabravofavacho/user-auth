@@ -26,14 +26,14 @@
                             {{-- Nome --}}
                             <div class="mb-3">
                                 <label class="form-label">Nome completo</label>
-                                <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" class="form-control" required>
+                                <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" class="form-control">
                                 <div class="invalid-feedback"></div>
                             </div>
 
                             {{-- E-mail --}}
                             <div class="mb-3">
                                 <label class="form-label">E-mail</label>
-                                <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" class="form-control" required>
+                                <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" class="form-control">
                                 <div class="invalid-feedback"></div>
                             </div>
 
@@ -107,8 +107,8 @@
 
         // Validação ao digitar nos campos de texto
         nameInput.addEventListener('input', () => {
-            if (nameInput.value.trim().length < 2) {
-                markInvalid(nameInput, 'O nome deve ter pelo menos 2 caracteres.');
+            if (nameInput.value.trim().length < 6) {
+                markInvalid(nameInput, 'O nome deve ter pelo menos 6 caracteres.');
             } else {
                 clearInvalid(nameInput);
             }

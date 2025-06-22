@@ -116,24 +116,44 @@
             clearInvalid(confirmInput);
         });
 
+        // Nome: mínimo 6 caracteres
+        userName.addEventListener('input', () => {
+            if (userName.value.trim().length >= 6) {
+                clearInvalid(userName);
+            } else {
+                markInvalid(userName, 'O nome deve ter pelo menos 6 caracteres.');
+            }
+        });
+
+        // E-mail: formato válido
+        userEmail.addEventListener('input', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(userEmail.value.trim())) {
+                clearInvalid(userEmail);
+            } else {
+                markInvalid(userEmail, 'Digite um e-mail válido.');
+            }
+        });
+
         form.addEventListener('submit', (e) => {
             let valid = true;
             const vName = userName.value;
             const vEmail = userEmail.value;
             const pwd = passwordInput.value;
             const confirm = confirmInput.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
             // Verificação de nome
-            if (!vName.trim()) {
-                markInvalid(userName, 'O nome é obrigatório.');
+            if (vName.trim().length < 6) {
+                markInvalid(userName, 'O nome deve ter pelo menos 6 caracteres.');
                 valid = false;
             } else {
                 clearInvalid(userName);
             }
 
             // Verificação de e-mail
-            if (!vEmail.trim()) {
-                markInvalid(userEmail, 'O e-mail é obrigatório.');
+            if (!emailRegex.test(vEmail.trim())) {
+                markInvalid(userEmail, 'Digite um e-mail válido.');
                 valid = false;
             } else {
                 clearInvalid(userEmail);
