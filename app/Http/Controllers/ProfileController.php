@@ -2,38 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
     public function edit()
     {
-        return view('profile.edit', ['user' => Auth::user()]);
+        return view('profile.edit', [
+            'user' => Auth::user(),
+        ]);
     }
 
-    public function update(Request $request)
+    public function update(ProfileUpdateRequest $request)
     {
         $user = Auth::user();
 
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'password' => ['nullable', 'confirmed', Password::defaults()],
-        ]);
+        // Atualiza nome e email
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
+        // Se houver imagem nova
+        if ($request->hasFile('profile_image')) {
+            // Remove imagem anterior, se existir
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
 
-        if (!empty($data['password'])) {
-            $user->password = Hash::make($data['password']);
+            // Armazena nova imagem
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $user->profile_image = $path;
         }
 
         $user->save();
 
-        return redirect()->route('profile.edit')->with('success', 'Perfil atualizado.');
+        return redirect()->route('profile.edit')->with('success', 'Perfil atualizado com sucesso!');
+    }
+
+    public function destroy()
+    {
+        $user = Auth::user();
+
+        // Opcional: remove imagem de perfil do storage
+        if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+            Storage::disk('public')->delete($user->profile_image);
+        }
+
+        $user->delete();
+
+        return redirect('/')->with('success', 'Conta excluída com sucesso.');
     }
 }

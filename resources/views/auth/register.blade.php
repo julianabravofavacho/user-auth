@@ -1,69 +1,73 @@
 <x-guest-layout>
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 90vh;">
-        <div class="col-md-6 col-lg-5">
-            <h2 class="mb-4 text-center">Cadastro</h2>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Cadastro de Usuário</h2>
 
-            @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                        @if ($errors->any())
+                        <div class="alert alert-danger rounded-3">
+                            <ul class="mb-0 ps-3">
+                                @foreach ($errors->all() as $error)
+                                <li class="small">{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+
+                        <form method="POST" action="{{ route('register') }}" id="registerForm" novalidate>
+                            @csrf
+
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label for="name" class="form-label">Nome completo</label>
+                                    <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label for="email" class="form-label">E-mail</label>
+                                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Senha</label>
+                                    <input id="password" type="password" class="form-control" name="password" required>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="password_confirmation" class="form-label">Confirmar senha</label>
+                                    <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                            </div>
+
+                            <ul id="password-rules" class="list-unstyled small text-muted mb-4">
+                                <li id="rule-length" class="text-danger">✗ Mínimo 8 caracteres</li>
+                                <li id="rule-upper" class="text-danger">✗ Pelo menos 1 letra maiúscula</li>
+                                <li id="rule-lower" class="text-danger">✗ Pelo menos 1 letra minúscula</li>
+                                <li id="rule-number" class="text-danger">✗ Pelo menos 1 número</li>
+                                <li id="rule-symbol" class="text-danger">✗ Pelo menos 1 símbolo (!, @, #, etc.)</li>
+                            </ul>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{{ route('login') }}" class="text-decoration-none small">Já tem conta? Faça login</a>
+                                <button type="submit" class="btn btn-success px-4">Cadastrar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            @endif
-
-            <form method="POST" action="{{ route('register') }}" id="registerForm">
-                @csrf
-
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nome</label>
-                    <input id="name" type="text" class="form-control" name="name" value="{{ old('name') }}" required autofocus>
-                    @error('name')
-                    <div class="text-danger small">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">E-mail</label>
-                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required>
-                    @error('email')
-                    <div class="text-danger small">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">Senha</label>
-                    <input id="password" type="password" class="form-control" name="password" required>
-                    <div class="invalid-feedback"></div>
-
-                    <ul id="password-rules" class="list-unstyled small mt-2 mb-4">
-                        <li id="rule-length" class="text-danger">✗ Mínimo 8 caracteres</li>
-                        <li id="rule-upper" class="text-danger">✗ Pelo menos 1 letra maiúscula</li>
-                        <li id="rule-lower" class="text-danger">✗ Pelo menos 1 letra minúscula</li>
-                        <li id="rule-number" class="text-danger">✗ Pelo menos 1 número</li>
-                        <li id="rule-symbol" class="text-danger">✗ Pelo menos 1 símbolo (!, @, #, etc.)</li>
-                    </ul>
-                </div>
-
-                <div class="mb-3">
-                    <label for="password_confirmation" class="form-label">Confirmar Senha</label>
-                    <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" required>
-                    <div class="invalid-feedback"></div>
-                </div>
-
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success">Cadastrar</button>
-                </div>
-
-                <div class="mt-3 text-center">
-                    <a href="{{ route('login') }}">Já tem conta? Faça login</a>
-                </div>
-            </form>
         </div>
     </div>
 
+    {{-- JS de validação --}}
     <script>
+        const userName = document.getElementById('name');
+        const userEmail = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const confirmInput = document.getElementById('password_confirmation');
         const form = document.getElementById('registerForm');
@@ -103,34 +107,75 @@
             input.nextElementSibling.textContent = '';
         }
 
-        passwordInput.addEventListener('input', function() {
+        passwordInput.addEventListener('input', () => {
             updatePasswordRules(passwordInput.value);
             clearInvalid(passwordInput);
         });
 
-        confirmInput.addEventListener('input', function() {
+        confirmInput.addEventListener('input', () => {
             clearInvalid(confirmInput);
         });
 
-        form.addEventListener('submit', function(e) {
+        // Nome: mínimo 6 caracteres
+        userName.addEventListener('input', () => {
+            if (userName.value.trim().length >= 6) {
+                clearInvalid(userName);
+            } else {
+                markInvalid(userName, 'O nome deve ter pelo menos 6 caracteres.');
+            }
+        });
+
+        // E-mail: formato válido
+        userEmail.addEventListener('input', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailRegex.test(userEmail.value.trim())) {
+                clearInvalid(userEmail);
+            } else {
+                markInvalid(userEmail, 'Digite um e-mail válido.');
+            }
+        });
+
+        form.addEventListener('submit', (e) => {
             let valid = true;
+            const vName = userName.value;
+            const vEmail = userEmail.value;
             const pwd = passwordInput.value;
             const confirm = confirmInput.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            const strong = Object.values(rules).every(rule => rule(pwd));
-            if (!strong) {
-                markInvalid(passwordInput, 'A senha não atende aos critérios de segurança.');
+            // Verificação de nome
+            if (vName.trim().length < 6) {
+                markInvalid(userName, 'O nome deve ter pelo menos 6 caracteres.');
                 valid = false;
+            } else {
+                clearInvalid(userName);
             }
 
+            // Verificação de e-mail
+            if (!emailRegex.test(vEmail.trim())) {
+                markInvalid(userEmail, 'Digite um e-mail válido.');
+                valid = false;
+            } else {
+                clearInvalid(userEmail);
+            }
+
+            // Validação da senha
+            if (!Object.values(rules).every(rule => rule(pwd))) {
+                markInvalid(passwordInput, 'A senha não atende aos critérios de segurança.');
+                valid = false;
+            } else {
+                clearInvalid(passwordInput);
+            }
+
+            // Confirmação de senha
             if (pwd !== confirm) {
                 markInvalid(confirmInput, 'As senhas não coincidem.');
                 valid = false;
+            } else {
+                clearInvalid(confirmInput);
             }
 
-            if (!valid) {
-                e.preventDefault();
-            }
+            if (!valid) e.preventDefault();
         });
     </script>
 </x-guest-layout>
