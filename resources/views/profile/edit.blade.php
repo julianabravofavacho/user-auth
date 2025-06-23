@@ -132,7 +132,7 @@
             let valid = true;
 
             if (nameInput.value.trim().length < 2) {
-                markInvalid(nameInput, 'O nome deve ter pelo menos 2 caracteres.');
+                markInvalid(nameInput, 'O nome deve ter pelo menos 6 caracteres.');
                 valid = false;
             }
 

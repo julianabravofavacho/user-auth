@@ -13,12 +13,12 @@ class LoginTest extends TestCase
     public function test_user_can_login_with_valid_credentials()
     {
         $user = User::factory()->create([
-            'password' => bcrypt('password123!')
+            'password' => bcrypt('Password123!')
         ]);
 
         $response = $this->post('/login', [
             'email' => $user->email,
-            'password' => 'password123!',
+            'password' => 'Password123!',
         ]);
 
         $response->assertRedirect('/dashboard');
@@ -27,7 +27,9 @@ class LoginTest extends TestCase
 
     public function test_user_cannot_login_with_invalid_password()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'password' => bcrypt('Password123!')
+        ]);
 
         $response = $this->from('/login')->post('/login', [
             'email' => $user->email,
